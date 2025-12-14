@@ -1,0 +1,27 @@
+TITLE: Production Deployment & Limits
+CONTEXT: Деплой бота и ограничения API Telegram.
+
+1. DOCKER COMPOSE STRATEGY
+Стек: Bot + PostgreSQL + Redis.
+Пример docker-compose.yml:
+services:
+  bot:
+    build: .
+    env_file: .env
+    depends_on: db, redis
+  db:
+    image: postgres:15-alpine
+    volumes: pg_data:/var/lib/postgresql/data
+  redis:
+    image: redis:alpine
+    command: redis-server --save 60 1 --loglevel warning
+
+2. TELEGRAM API LIMITS (Безопасность)
+- Личка (Private): макс. 30 сообщений/сек на всего бота. 1 сообщ/сек одному юзеру.
+- Группы: макс. 20 сообщений/мин в одну группу.
+- Рассылки: Скорость не выше 25 сообщений/сек, иначе 429 Error. Нужна очередь (Celery/Redis).
+
+3. SAFETY RULES
+- Никогда не хранить токены в коде. Только .env.
+- Логирование через `structlog` (JSON формат), а не `print()`.
+- Использовать Redis для FSM (машины состояний), чтобы не терять диалоги при перезагрузке.
