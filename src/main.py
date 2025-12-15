@@ -13,10 +13,25 @@ logger = structlog.get_logger()
 
 async def main():
     # Basic logging config
+    # Shared processors
+    processors = [
+        structlog.stdlib.add_log_level,
+        structlog.stdlib.add_logger_name,
+        structlog.processors.TimeStamper(fmt="iso", utc=True),
+        structlog.processors.StackInfoRenderer(),
+        structlog.processors.format_exc_info,
+    ]
+    
+    # Renderer selection
+    if config.DEBUG:
+        processors.append(structlog.dev.ConsoleRenderer())
+    else:
+        processors.append(structlog.processors.JSONRenderer())
+
     structlog.configure(
-        processors=[
-            structlog.processors.JSONRenderer()
-        ]
+        processors=processors,
+        logger_factory=structlog.stdlib.LoggerFactory(),
+        cache_logger_on_first_use=True,
     )
     
     # Dependencies

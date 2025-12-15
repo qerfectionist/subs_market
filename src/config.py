@@ -15,6 +15,8 @@ class Settings(BaseSettings):
     REDIS_PASSWORD: str | None = None
     
     ADMIN_IDS: list[int]
+    
+    DEBUG: bool = False
 
 
     @property
