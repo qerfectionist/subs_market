@@ -177,7 +177,7 @@ class GetUserClubsResponse:
 @dataclass(frozen=True)
 class SearchClubsRequest:
     category: Optional[str] = None
-    # has_free_slots: bool = False
+    only_free_slots: bool = False
 
 @dataclass(frozen=True)
 class SearchClubsResponse:

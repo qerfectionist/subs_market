@@ -23,13 +23,30 @@ class ClubRepositoryImpl(ClubRepository):
         models = result.scalars().all()
         return [to_domain_club(model) for model in models]
 
-    async def search(self, category: Optional[str] = None) -> List[Club]:
+    async def search(self, category: Optional[str] = None, only_free_slots: bool = False) -> List[Club]:
         stmt = select(ClubModel)
         if category:
             from ..models.subscription_service import SubscriptionServiceModel
             stmt = stmt.join(SubscriptionServiceModel, ClubModel.service_id == SubscriptionServiceModel.service_id)\
                        .where(SubscriptionServiceModel.category == category)
         
+        if only_free_slots:
+            from sqlalchemy import func
+            from ..models.subscription_tariff import SubscriptionTariffModel
+            from ..models.club_member import ClubMemberModel
+            
+            # Subquery to count ACTIVE members
+            # Assuming 'ACTIVE' is the status for occupied slots
+            member_count_subq = (
+                select(func.count(ClubMemberModel.user_id))
+                .where(ClubMemberModel.club_id == ClubModel.club_id)
+                .where(ClubMemberModel.status.in_(['ACTIVE', 'PENDING'])) # Treat Pending as occupied? Safer.
+                .scalar_subquery()
+            )
+            
+            stmt = stmt.join(SubscriptionTariffModel, ClubModel.tariff_id == SubscriptionTariffModel.tariff_id)
+            stmt = stmt.where(member_count_subq < SubscriptionTariffModel.capacity)
+
         result = await self._session.execute(stmt)
         models = result.scalars().all()
         return [to_domain_club(model) for model in models]

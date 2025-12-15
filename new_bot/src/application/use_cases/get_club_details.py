@@ -11,7 +11,7 @@ async def execute(uow: UnitOfWork, request: GetClubDetailsRequest) -> Optional[G
         if not club:
             return None
         
-        member_count = await uow.membership.count_members(request.club_id)
+        member_count = await uow.memberships.count_members(request.club_id)
         
         # Get tariff capacity
         # We need tariff info. Club Entity has `tariff_id` but not capacity.
