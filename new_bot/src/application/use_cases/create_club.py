@@ -16,6 +16,14 @@ async def execute(uow: UnitOfWork, request: CreateClubRequest) -> CreateClubResp
         # Generator for IDs
         club_id = ClubId(uuid.uuid4())
         
+        # Simple unique code generator (e.g., #NET-1A2B)
+        # In prod, check for collision loop
+        import random, string
+        chars = string.ascii_uppercase + string.digits
+        suffix = ''.join(random.choices(chars, k=4))
+        # Assuming category prefix is hardcoded or derived. For now generic.
+        short_code = f"#CLUB-{suffix}"
+
         # TODO: Generate real token via Domain Service
         token_value = "generated_token_" + str(uuid.uuid4()) 
         token = OneTimeToken(token_value)
@@ -28,7 +36,8 @@ async def execute(uow: UnitOfWork, request: CreateClubRequest) -> CreateClubResp
             tariff_id=request.tariff_id,
             title=request.title,
             price=request.price,
-            status=ClubStatus.RECRUITING
+            status=ClubStatus.RECRUITING,
+            short_code=short_code
         )
 
         await uow.clubs.add(new_club)
@@ -41,4 +50,4 @@ async def execute(uow: UnitOfWork, request: CreateClubRequest) -> CreateClubResp
 
         await uow.commit()
 
-        return CreateClubResponse(club_id=club_id, link_token=token)
+        return CreateClubResponse(club_id=club_id, link_token=token, short_code=short_code)

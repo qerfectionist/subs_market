@@ -17,3 +17,4 @@ class ClubModel(Base):
     title: Mapped[str] = mapped_column(String, nullable=False)
     price_amount: Mapped[int] = mapped_column(Integer, nullable=False) # MoneyKZT -> int
     status: Mapped[ClubStatus] = mapped_column(Enum(ClubStatus), nullable=False)
+    short_code: Mapped[str] = mapped_column(String, nullable=True, unique=True)

@@ -17,6 +17,12 @@ class ClubRepositoryImpl(ClubRepository):
         model = result.scalar_one_or_none()
         return to_domain_club(model) if model else None
 
+    async def get_by_code(self, code: str) -> Optional[Club]:
+        stmt = select(ClubModel).where(ClubModel.short_code == code)
+        result = await self._session.execute(stmt)
+        model = result.scalar_one_or_none()
+        return to_domain_club(model) if model else None
+
     async def get_all_by_owner(self, owner_id: UserId) -> List[Club]:
         stmt = select(ClubModel).where(ClubModel.owner_user_id == owner_id)
         result = await self._session.execute(stmt)

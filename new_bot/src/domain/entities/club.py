@@ -13,3 +13,4 @@ class Club:
     title: str
     price: MoneyKZT
     status: ClubStatus
+    short_code: str | None = None

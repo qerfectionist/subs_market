@@ -19,6 +19,7 @@ DEFAULT_SERVICE_ID = ServiceId(uuid.UUID('00000000-0000-0000-0000-000000000002')
 DEFAULT_TARIFF_ID = TariffId(uuid.UUID('00000000-0000-0000-0000-000000000003'))
 
 # --- Create Club Flow ---
+@router.message(F.text == "➕ Создать клуб")
 @router.message(Command("create_club"))
 async def start_create_club(message: types.Message, state: FSMContext):
     await message.answer("Let's create a club. Please enter the Club Title:")
@@ -63,7 +64,15 @@ async def process_price(message: types.Message, state: FSMContext, uow_factory):
     )
     
     response = await create_club.execute(uow, request)
-    await message.answer(ClubPresenter.present_created(response))
+    
+    # Present the result with the new Short Code
+    await message.answer(
+        f"✅ <b>Клуб успешно создан!</b>\n\n"
+        f"📛 Название: {response.short_code} (Это уникальный код для поиска!)\n"
+        f"💰 Цена: {request.price.amount} ₸\n\n"
+        f"Теперь добавьте бота в вашу группу как Администратора и отправьте команду:\n"
+        f"<code>/link_group {response.link_token.value}</code>"
+    )
     await state.clear()
 
 # --- Link Group ---

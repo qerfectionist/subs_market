@@ -176,10 +176,7 @@ async def process_club_view(callback: types.CallbackQuery, callback_data: ClubCa
     )
 
 
-@router.message(F.text == "➕ Создать клуб")
-@router.message(Command("create_club"))
-async def cmd_create_club(message: types.Message):
-    await message.answer("🚧 Функция создания клуба в разработке.")
+
 
 @router.message(F.text == "👤 Профиль")
 @router.message(Command("profile"))

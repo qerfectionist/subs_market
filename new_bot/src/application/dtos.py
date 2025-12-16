@@ -40,6 +40,7 @@ class CreateClubRequest:
 class CreateClubResponse:
     club_id: ClubId
     link_token: OneTimeToken
+    short_code: str | None = None
 
 # Link Group
 @dataclass(frozen=True)

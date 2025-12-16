@@ -116,7 +116,8 @@ def to_domain_club(model: ClubModel) -> Club:
         tariff_id=TariffId(model.tariff_id),
         title=model.title,
         price=MoneyKZT(model.price_amount),
-        status=model.status
+        status=model.status,
+        short_code=model.short_code
     )
 
 def to_db_club(entity: Club) -> ClubModel:
@@ -128,7 +129,8 @@ def to_db_club(entity: Club) -> ClubModel:
         tariff_id=entity.tariff_id,
         title=entity.title,
         price_amount=entity.price.amount,
-        status=entity.status
+        status=entity.status,
+        short_code=entity.short_code
     )
 
 # --- Billing Period ---
